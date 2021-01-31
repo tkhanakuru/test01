@@ -471,9 +471,8 @@ bool jflag = false; // ジャンプフラグ
 		loop++;
 
 		//斜め移動の場合は横顔を優先
-		if (move == 0.71f) {
-
-		}
+//		if (move == 0.71f) {
+//		}
 
 		result = (row * 3) + col;
 		//DrawGraph(x, y, gh[result], TRUE);
