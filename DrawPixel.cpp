@@ -1,6 +1,6 @@
 #include "DxLib.h"
 
-#define _LESSON9 // 現在実施中のレッスン
+#define _LESSON10 // 現在実施中のレッスン
 
 // プログラムは WinMain から始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -14,8 +14,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	
 	// 座標
-	int x = 320;
-	int y = 240;
+	int x = 300;
+	int y = 360;
+	int y_prev = 0;
+	int y_temp = 0;
+
 	
 	// 移動係数
 	float move = 0.0;
@@ -321,6 +324,85 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	int pre_col=col; // 1つ前の画像の列位置
 
 	int loop = 0;
+while (ScreenFlip() == 0 && ProcessMessage() == 0 && ClearDrawScreen() == 0 && GetHitKeyStateAll(key) == 0) {
+
+	move = 1.0f;
+
+	if (key[KEY_INPUT_LEFT] == 1 || key[KEY_INPUT_RIGHT]) {
+		if (key[KEY_INPUT_UP] == 1 || key[KEY_INPUT_DOWN]) {
+			move = 0.71f;
+		}
+		else {
+			move = 1.0f;
+		}
+	}
+
+	// 斜め移動の時は横向きを優先するために、縦方向の判定の後で横方向の判定処理を行う
+	if (key[KEY_INPUT_UP] == 1) {
+		y -= (int)4 * move;
+		row = 0;
+	}
+	if (key[KEY_INPUT_DOWN] == 1) {
+		y += (int)4 * move;
+		row = 2;
+	}
+	if (key[KEY_INPUT_LEFT] == 1) {
+		x -= (int)4 * move;
+		row = 3;
+	}
+	if (key[KEY_INPUT_RIGHT] == 1) {
+		x += (int)4 * move;
+		row = 1;
+	}
+
+
+	if (loop == 10) {// loop30回に1回だけ列を変更する
+
+		if (col == 0 || col == 2) {
+			pre_col = col; // １つ前の列を保持
+			col = 1;
+		}
+		else if (col == 1) {
+			if (pre_col == 0) {
+				col = 2;
+			}
+			else {// pre_col == 2
+				col = 0;
+			}
+		}
+
+		loop = 0; // ループカウンタリセット
+	}
+	loop++;
+
+	//斜め移動の場合は横顔を優先
+	if (move == 0.71f) {
+
+	}
+
+	result = (row * 3) + col;
+	DrawGraph(x, y, gh[result], TRUE);
+
+
+	if (key[KEY_INPUT_ESCAPE] == 1) {
+		break;
+	}
+}
+#endif
+
+#ifdef _LESSON10	// キャラを歩かせる
+int xcount = 0;
+int ycount = 0;
+int ix = 0;
+int iy = 0;
+int result = 0;
+int row = 2; // 画像の行位置と向いてる方向（0:UP, 1:RIGHT, 2:DOWN, 3:LEFT）
+int col = 1; // 画像の列位置
+int pre_col = col; // 1つ前の画像の列位置
+bool jflag = false; // ジャンプフラグ
+
+
+	int loop = 0;
 	while (ScreenFlip() == 0 && ProcessMessage() == 0 && ClearDrawScreen() == 0 && GetHitKeyStateAll(key) == 0) {
 
 		move = 1.0f;
@@ -335,14 +417,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 
 		// 斜め移動の時は横向きを優先するために、縦方向の判定の後で横方向の判定処理を行う
-		if (key[KEY_INPUT_UP] == 1) {
-			y -= (int)4 * move;
-			row = 0;
-		}
-		if (key[KEY_INPUT_DOWN] == 1) {
-			y += (int)4 * move;
-			row = 2;
-		}
 		if (key[KEY_INPUT_LEFT] == 1) {
 			x -= (int)4 * move;
 			row = 3;
@@ -352,22 +426,46 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			row = 1;
 		}
 
+		// 画面移動制御
+		if (x + (49 / 2) > 640) {
+			x = 640 - (49 / 2);
+		}
+		if (x < (49 / 2)) {
+			x = (49 / 2);
+		}
 
-		if (loop==10) {// loop30回に1回だけ列を変更する
+
+		// ジャンプ処理
+		if (jflag == true) {
+			y_temp = y;
+			y += (y - y_prev) + 1;
+			y_prev = y_temp;
+			if (y == 360) {
+				jflag = false;
+			}
+		}
+
+		if (key[KEY_INPUT_SPACE] == 1 && jflag == false){
+			jflag = true;
+			y_prev = y;
+			y -= 20;
+		}
+
+		if (loop == 10) {// loop30回に1回だけ列を変更する
 
 			if (col == 0 || col == 2) {
 				pre_col = col; // １つ前の列を保持
 				col = 1;
 			}
-			else if (col == 1){
+			else if (col == 1) {
 				if (pre_col == 0) {
 					col = 2;
 				}
 				else {// pre_col == 2
 					col = 0;
 				}
-			}			
-			
+			}
+
 			loop = 0; // ループカウンタリセット
 		}
 		loop++;
@@ -378,7 +476,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 
 		result = (row * 3) + col;
-		DrawGraph(x, y, gh[result], TRUE);
+		//DrawGraph(x, y, gh[result], TRUE);
+		DrawGraph(x - (49 / 2), y - (66 / 2), gh[result], TRUE);
+
 
 
 		if (key[KEY_INPUT_ESCAPE] == 1) {
