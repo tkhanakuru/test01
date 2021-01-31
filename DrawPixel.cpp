@@ -15,7 +15,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	
 	// 座標
 	int x = 300;
-	int y = 360;
+	int y = 260;
 	int y_prev = 0;
 	int y_temp = 0;
 
@@ -440,7 +440,7 @@ bool jflag = false; // ジャンプフラグ
 			y_temp = y;
 			y += (y - y_prev) + 1;
 			y_prev = y_temp;
-			if (y == 360) {
+			if (y == 260) {
 				jflag = false;
 			}
 		}
@@ -476,7 +476,11 @@ bool jflag = false; // ジャンプフラグ
 
 		result = (row * 3) + col;
 		//DrawGraph(x, y, gh[result], TRUE);
-		DrawGraph(x - (49 / 2), y - (66 / 2), gh[result], TRUE);
+//		DrawGraph(x - (49 / 2), y - (66 / 2), gh[result], TRUE);
+
+		// 2倍拡大表示
+		DrawExtendGraph(x - (49 / 2), y - (66 / 2), (x - (49 / 2))+200, (y - (66 / 2))+200, gh[result], TRUE);
+
 
 
 
