@@ -1,3 +1,4 @@
+// git commit test
 #include "DxLib.h"
 
 #define _LESSON10 // Œ»İÀ{’†‚ÌƒŒƒbƒXƒ“
